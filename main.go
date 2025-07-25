@@ -22,38 +22,40 @@ type PipelineConfig struct {
 
 func main() {
 	// Parse command line arguments
-	pipelineName := flag.String("pipeline", "telegram", "Name of the pipeline to execute")
+	pipelineName := flag.String("pipeline", "", "Pipeline to execute")
 	flag.Parse()
 
-	log.Printf("🚀 Starting Automation Chain Go - Pipeline: %s", *pipelineName)
-
-	// Load pipeline configuration
-	pipelineConfig, err := loadPipelineConfig(*pipelineName)
-	if err != nil {
-		log.Fatalf("Failed to load pipeline config: %v", err)
-	}
-	log.Println("✅ Pipeline configuration loaded successfully")
-
-	// Create pipeline builder (loads credentials internally)
-	builder := pipelinebase.NewPipelineBuilder()
-
-	// Build pipeline
-	pipeline, err := builder.BuildPipeline(pipelineConfig.Name, pipelineConfig.Nodes)
-	if err != nil {
-		log.Fatalf("Failed to build pipeline: %v", err)
+	if *pipelineName == "" {
+		log.Fatal("Pipeline name required")
 	}
 
-	log.Printf("📋 Pipeline configured with %d nodes", pipeline.GetNodeCount())
+	log.Printf("🚀 Executing pipeline: %s", *pipelineName)
 
-	// Execute pipeline
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if err := pipeline.Execute(ctx); err != nil {
+	// Ejecutar pipeline
+	if err := runPipeline(*pipelineName); err != nil {
 		log.Fatalf("Pipeline execution failed: %v", err)
 	}
 
-	log.Println("🎉 Application completed successfully!")
+	log.Println("✅ Pipeline completed successfully")
+}
+
+func runPipeline(name string) error {
+	// Tu lógica actual de ejecución
+	pipelineConfig, err := loadPipelineConfig(name)
+	if err != nil {
+		return err
+	}
+
+	builder := pipelinebase.NewPipelineBuilder()
+	pipeline, err := builder.BuildPipeline(pipelineConfig.Name, pipelineConfig.Nodes)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	return pipeline.Execute(ctx)
 }
 
 // loadPipelineConfig loads pipeline configuration from JSON file
