@@ -1,4 +1,4 @@
-module test-chain-go-cursor
+module automation-chain
 
 go 1.21
 

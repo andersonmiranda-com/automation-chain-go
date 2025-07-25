@@ -3,9 +3,9 @@ package tests
 import (
 	"testing"
 
-	"test-chain-go-cursor/config"
-	nodesbase "test-chain-go-cursor/nodes/base"
-	pipelinebase "test-chain-go-cursor/pipelines/base"
+	"automation-chain/config"
+	nodesbase "automation-chain/nodes/base"
+	pipelinebase "automation-chain/pipelines/base"
 )
 
 func TestPipelineBuilder(t *testing.T) {

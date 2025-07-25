@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"test-chain-go-cursor/nodes/base"
-	"test-chain-go-cursor/services"
+	"automation-chain/nodes/base"
+	"automation-chain/services"
 )
 
 // TelegramPublisherNode publishes messages to a Telegram channel

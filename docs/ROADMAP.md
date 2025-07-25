@@ -78,7 +78,7 @@ Create a modular pipeline system with reusable and configurable nodes, similar t
 ## 🏗️ Current Folder Structure
 
 ```
-test-chain-go-cursor/
+automation-chain/
 ├── nodes/
 │   ├── base/
 │   │   └── node.go              # Base Node interface

@@ -17,7 +17,7 @@ The application uses a **modular node-based architecture** similar to n8n, allow
 
 ```bash
 git clone <repository-url>
-cd test-chain-go-cursor
+cd automation-chain
 go mod tidy
 ```
 

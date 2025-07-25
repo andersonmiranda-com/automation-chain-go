@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 
-	"test-chain-go-cursor/nodes/ai"
-	"test-chain-go-cursor/nodes/base"
-	"test-chain-go-cursor/nodes/publishers"
+	"automation-chain/nodes/ai"
+	"automation-chain/nodes/base"
+	"automation-chain/nodes/publishers"
 )
 
 // PipelineBuilder builds pipelines from configuration

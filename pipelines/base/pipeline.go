@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"test-chain-go-cursor/nodes/base"
+	"automation-chain/nodes/base"
 )
 
 // Pipeline orchestrates the execution of nodes

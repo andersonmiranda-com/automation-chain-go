@@ -4,7 +4,7 @@
 
 ### 1. New Folder Structure
 ```
-test-chain-go-cursor/
+automation-chain/
 ├── nodes/
 │   ├── base/
 │   │   └── node.go              # Base Node interface

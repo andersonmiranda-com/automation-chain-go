@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	nodesbase "test-chain-go-cursor/nodes/base"
-	pipelinebase "test-chain-go-cursor/pipelines/base"
+	nodesbase "automation-chain/nodes/base"
+	pipelinebase "automation-chain/pipelines/base"
 )
 
 // PipelineConfig represents the configuration of a pipeline
