@@ -1,14 +1,15 @@
-# LangChain Go - Motivational Content Pipeline
+# Automation Chain Go
 
-A modular Go application that generates motivational content using OpenAI and publishes it to Telegram channels using a flexible, n8n-like pipeline architecture.
+A modular Go application that automates content generation and publishing using a flexible n8n-like pipeline architecture. It allows you to create customizable automation chains that connect different services and APIs to automate complex workflows.
 
 ## 🏗️ Architecture Overview
 
-The application uses a **modular node-based architecture** similar to n8n, allowing you to create reusable and configurable pipelines:
+The application uses a **modular node-based architecture** similar to n8n, allowing you to create reusable and configurable automation chains:
 
-- **TextGeneratorNode**: Generates motivational content using OpenAI
-- **TelegramPublisherNode**: Publishes messages to Telegram channels
-- **Pipeline**: Orchestrates node execution in sequence
+- **Input Nodes**: Capture data from external sources (APIs, databases, files)
+- **Processing Nodes**: Transform and analyze data (AI, formatting, validation)
+- **Output Nodes**: Publish content to different platforms (social media, APIs)
+- **Pipeline**: Orchestrates sequential node execution
 - **PipelineBuilder**: Constructs pipelines from JSON configuration
 
 ## 🚀 Quick Start
@@ -23,7 +24,13 @@ go mod tidy
 
 ### 2. Configure Credentials
 
-Create `config/credentials.json` with your API keys:
+Copy the example file and create your own credentials:
+
+```bash
+cp config/credentials_example.json config/credentials.json
+```
+
+Then edit `config/credentials.json` with your actual API keys:
 
 ```json
 {
@@ -34,7 +41,7 @@ Create `config/credentials.json` with your API keys:
   },
   "telegram": {
     "motivational_bot": {
-      "bot_token": "your-telegram-bot-token",
+      "token": "your-telegram-bot-token",
       "channel_id": "@your_channel_or_channel_id"
     }
   }
@@ -48,7 +55,8 @@ The pipeline configuration is in `config/pipelines/telegram.json`:
 ```json
 {
   "name": "telegram_pipeline",
-  "description": "Generate and publish motivational content to Telegram",
+  "description": "Generates and publishes motivational texts to Telegram",
+  "schedule": "0 9 * * *",
   "nodes": [
     {
       "id": "text_generator",
@@ -56,8 +64,10 @@ The pipeline configuration is in `config/pipelines/telegram.json`:
       "name": "Generate Motivational Text",
       "credentials": "default",
       "config": {
-        "prompt_template": "Generate a motivational message in Spanish...",
-        "max_tokens": 150
+        "model": "gpt-3.5-turbo",
+        "prompt_template": "Generate a short and powerful motivational text in Spanish...",
+        "max_tokens": 300,
+        "temperature": 0.8
       }
     },
     {
@@ -66,7 +76,7 @@ The pipeline configuration is in `config/pipelines/telegram.json`:
       "name": "Publish to Telegram",
       "credentials": "motivational_bot",
       "config": {
-        "message_format": "text"
+        "message_template": "💪 *Daily Motivational Message*\n\n%s\n\n✨ Have an amazing day!"
       }
     }
   ]
@@ -77,6 +87,19 @@ The pipeline configuration is in `config/pipelines/telegram.json`:
 
 ```bash
 go run main.go
+```
+
+The application will automatically load the pipeline configuration and execute it. You can modify the pipeline name in `main.go` to run different pipelines.
+
+### Available Pipelines
+
+- **telegram**: Generates motivational content and publishes to Telegram
+- **telegram_news**: Generates news content and publishes to Telegram  
+- **multi_telegram**: Publishes to multiple Telegram channels
+
+To run a different pipeline, modify line 20 in `main.go`:
+```go
+pipelineConfig, err := loadPipelineConfig("telegram") // Change "telegram" to desired pipeline
 ```
 
 ## 🔧 Configuration Guide
@@ -94,6 +117,7 @@ go run main.go
 2. Create a new bot with `/newbot`
 3. Save the bot token
 4. Add the bot to your channel as administrator
+5. Make sure the bot has permission to send messages
 
 ### Get Channel ID
 
@@ -111,7 +135,7 @@ For public channels:
 For private channels:
 - Send a message to the channel
 - Visit: `https://api.telegram.org/bot<TOKEN>/getUpdates`
-- Find the `chat.id` in the response
+- Find the `chat.id` in the response (it will be a negative number)
 
 ## 📁 Project Structure
 
@@ -132,7 +156,7 @@ For private channels:
 │   ├── openai.go            # OpenAI API client
 │   └── telegram.go          # Telegram Bot API client
 ├── config/                   # Configuration files
-│   ├── credentials.json      # API keys and tokens
+│   ├── credentials.json      # API keys and tokens (create this file)
 │   ├── credentials_example.json # Example credentials structure
 │   ├── credentials_test.json # Test credentials
 │   └── pipelines/           # Pipeline definitions
@@ -160,6 +184,8 @@ The application uses a **reference-based credential system**:
   "service_name": {
     "credential_name": {
       "api_key": "value",
+      "token": "value",
+      "channel_id": "value",
       "other_param": "value"
     }
   }
@@ -187,11 +213,11 @@ You can have multiple credentials per service:
 {
   "telegram": {
     "motivational_bot": {
-      "bot_token": "token1",
+      "token": "token1",
       "channel_id": "@motivational"
     },
     "news_bot": {
-      "bot_token": "token2", 
+      "token": "token2", 
       "channel_id": "@news"
     }
   }
@@ -287,9 +313,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 **"Telegram channel not found"**
 - Verify the bot is added to the channel as administrator
 - Check that the channel ID is correct (use `tools/get_channel_id.go`)
+- Ensure the bot has permission to send messages
+- For private channels, make sure the bot is a member of the channel
 
 **"OpenAI API error"**
 - Verify your API key is correct and has sufficient credits
-- Check that the model name is valid
+- Check that the model name is valid (e.g., "gpt-3.5-turbo", "gpt-4")
+- Ensure your OpenAI account has access to the specified model
 
 For more detailed troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
