@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -37,14 +38,17 @@ type UpdatesResponse struct {
 }
 
 func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run get_channel_id.go <BOT_TOKEN>")
-		fmt.Println("Example: go run get_channel_id.go 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz")
+	// Parse command line arguments
+	botToken := flag.String("token", "", "Telegram bot token")
+	flag.Parse()
+
+	if *botToken == "" {
+		fmt.Println("Error: Bot token is required")
+		fmt.Println("Usage: go run get_channel_id.go -token <BOT_TOKEN>")
+		fmt.Println("Example: go run get_channel_id.go -token 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz")
 		os.Exit(1)
 	}
-
-	botToken := os.Args[1]
-	url := fmt.Sprintf("https://api.telegram.org/bot%s/getUpdates", botToken)
+	url := fmt.Sprintf("https://api.telegram.org/bot%s/getUpdates", *botToken)
 
 	fmt.Println(url)
 

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"log"
 	"os"
 	"time"
@@ -20,10 +21,14 @@ type PipelineConfig struct {
 }
 
 func main() {
-	log.Println("🚀 Starting LangChain Go - Credentials Architecture")
+	// Parse command line arguments
+	pipelineName := flag.String("pipeline", "telegram", "Name of the pipeline to execute")
+	flag.Parse()
+
+	log.Printf("🚀 Starting Automation Chain Go - Pipeline: %s", *pipelineName)
 
 	// Load pipeline configuration
-	pipelineConfig, err := loadPipelineConfig("telegram")
+	pipelineConfig, err := loadPipelineConfig(*pipelineName)
 	if err != nil {
 		log.Fatalf("Failed to load pipeline config: %v", err)
 	}

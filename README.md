@@ -86,10 +86,15 @@ The pipeline configuration is in `config/pipelines/telegram.json`:
 ### 4. Run the Application
 
 ```bash
+# Run with default pipeline (telegram)
 go run main.go
+
+# Run with specific pipeline
+go run main.go -pipeline telegram_news
+go run main.go -pipeline multi_telegram
 ```
 
-The application will automatically load the pipeline configuration and execute it. You can modify the pipeline name in `main.go` to run different pipelines.
+The application will load the specified pipeline configuration and execute it.
 
 ### Available Pipelines
 
@@ -97,10 +102,10 @@ The application will automatically load the pipeline configuration and execute i
 - **telegram_news**: Generates news content and publishes to Telegram  
 - **multi_telegram**: Publishes to multiple Telegram channels
 
-To run a different pipeline, modify line 20 in `main.go`:
-```go
-pipelineConfig, err := loadPipelineConfig("telegram") // Change "telegram" to desired pipeline
-```
+### Command Line Options
+
+- `-pipeline`: Specify the pipeline name to execute (default: "telegram")
+- `-h` or `-help`: Show help information
 
 ## 🔧 Configuration Guide
 
@@ -124,7 +129,7 @@ pipelineConfig, err := loadPipelineConfig("telegram") // Change "telegram" to de
 **Option 1: Use the included tool**
 
 ```bash
-go run tools/get_channel_id.go <YOUR_BOT_TOKEN>
+go run tools/get_channel_id.go -token <YOUR_BOT_TOKEN>
 ```
 
 **Option 2: Manual method**
