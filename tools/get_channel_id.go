@@ -46,6 +46,8 @@ func main() {
 	botToken := os.Args[1]
 	url := fmt.Sprintf("https://api.telegram.org/bot%s/getUpdates", botToken)
 
+	fmt.Println(url)
+
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalf("Failed to get updates: %v", err)

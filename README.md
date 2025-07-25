@@ -1,103 +1,295 @@
-# LangChain Go - Aplicación de Textos Motivacionales
+# LangChain Go - Motivational Content Pipeline
 
-Una aplicación modular en Go que genera textos motivacionales usando OpenAI y los publica en Telegram.
+A modular Go application that generates motivational content using OpenAI and publishes it to Telegram channels using a flexible, n8n-like pipeline architecture.
 
-## Arquitectura de Nodos
+## 🏗️ Architecture Overview
 
-La aplicación está diseñada con una arquitectura de nodos que permite agregar fácilmente nuevas funcionalidades:
+The application uses a **modular node-based architecture** similar to n8n, allowing you to create reusable and configurable pipelines:
 
-- **TextGeneratorNode**: Genera textos motivacionales usando OpenAI
-- **TelegramPublisherNode**: Publica mensajes en un canal de Telegram
-- **Pipeline**: Orquesta la ejecución de los nodos en secuencia
+- **TextGeneratorNode**: Generates motivational content using OpenAI
+- **TelegramPublisherNode**: Publishes messages to Telegram channels
+- **Pipeline**: Orchestrates node execution in sequence
+- **PipelineBuilder**: Constructs pipelines from JSON configuration
 
-## Configuración
+## 🚀 Quick Start
 
-### 1. Configurar OpenAI
-
-1. Ve a [OpenAI API](https://platform.openai.com/api-keys)
-2. Crea una nueva API key
-3. Copia la key (comienza con `sk-`)
-
-### 2. Configurar Telegram Bot
-
-1. Habla con [@BotFather](https://t.me/botfather) en Telegram
-2. Crea un nuevo bot con `/newbot`
-3. Guarda el token del bot
-4. Agrega el bot a tu canal como administrador
-
-### 3. Obtener ID del Canal
-
-**Opción 1: Usar la herramienta incluida**
+### 1. Clone and Setup
 
 ```bash
-go run tools/get_channel_id.go <TU_BOT_TOKEN>
-```
-
-**Opción 2: Manual**
-Para canales públicos:
-
-- Usa el nombre del canal con @ (ej: `@mi_canal`)
-
-Para canales privados:
-
-- Envía un mensaje al canal
-- Visita: `https://api.telegram.org/bot<TOKEN>/getUpdates`
-- Busca el `chat.id` en la respuesta
-
-### 4. Configurar Variables de Entorno
-
-Crea un archivo `.env` con las siguientes variables:
-
-```env
-OPENAI_API_KEY=tu_api_key_de_openai
-TELEGRAM_BOT_TOKEN=tu_token_del_bot
-TELEGRAM_CHANNEL_ID=@tu_canal_o_id_del_canal
-```
-
-### 5. Instalar y Ejecutar
-
-```bash
-# Instalar dependencias
+git clone <repository-url>
+cd test-chain-go-cursor
 go mod tidy
+```
 
-# Ejecutar la aplicación
+### 2. Configure Credentials
+
+Create `config/credentials.json` with your API keys:
+
+```json
+{
+  "openai": {
+    "default": {
+      "api_key": "sk-your-openai-api-key"
+    }
+  },
+  "telegram": {
+    "motivational_bot": {
+      "bot_token": "your-telegram-bot-token",
+      "channel_id": "@your_channel_or_channel_id"
+    }
+  }
+}
+```
+
+### 3. Configure Pipeline
+
+The pipeline configuration is in `config/pipelines/telegram.json`:
+
+```json
+{
+  "name": "telegram_pipeline",
+  "description": "Generate and publish motivational content to Telegram",
+  "nodes": [
+    {
+      "id": "text_generator",
+      "type": "text_generator",
+      "name": "Generate Motivational Text",
+      "credentials": "default",
+      "config": {
+        "prompt_template": "Generate a motivational message in Spanish...",
+        "max_tokens": 150
+      }
+    },
+    {
+      "id": "telegram_publisher",
+      "type": "telegram_publisher", 
+      "name": "Publish to Telegram",
+      "credentials": "motivational_bot",
+      "config": {
+        "message_format": "text"
+      }
+    }
+  ]
+}
+```
+
+### 4. Run the Application
+
+```bash
 go run main.go
 ```
 
-## Agregar Nuevos Nodos
+## 🔧 Configuration Guide
 
-Para agregar un nuevo nodo:
+### OpenAI Setup
 
-1. Implementa la interfaz `Node` en un nuevo archivo
-2. Registra el nodo en el pipeline en `main.go`
-3. El nodo se ejecutará automáticamente en la secuencia
+1. Go to [OpenAI API](https://platform.openai.com/api-keys)
+2. Create a new API key
+3. Copy the key (starts with `sk-`)
+4. Add it to `config/credentials.json` under `openai.default.api_key`
 
-### Ejemplo: Agregar un Nodo de Formateo
+### Telegram Bot Setup
 
-Para agregar el nodo de formateo de texto, simplemente agrega estas líneas en `main.go`:
+1. Talk to [@BotFather](https://t.me/botfather) on Telegram
+2. Create a new bot with `/newbot`
+3. Save the bot token
+4. Add the bot to your channel as administrator
+
+### Get Channel ID
+
+**Option 1: Use the included tool**
+
+```bash
+go run tools/get_channel_id.go <YOUR_BOT_TOKEN>
+```
+
+**Option 2: Manual method**
+
+For public channels:
+- Use the channel name with @ (e.g., `@my_channel`)
+
+For private channels:
+- Send a message to the channel
+- Visit: `https://api.telegram.org/bot<TOKEN>/getUpdates`
+- Find the `chat.id` in the response
+
+## 📁 Project Structure
+
+```
+├── main.go                    # Application entry point
+├── nodes/                     # Node implementations
+│   ├── base/                  # Base interfaces and types
+│   │   └── node.go           # Node interface definition
+│   ├── ai/                   # AI-related nodes
+│   │   └── text_generator.go # OpenAI text generation
+│   └── publishers/           # Publishing nodes
+│       └── telegram_publisher.go # Telegram publishing
+├── pipelines/                # Pipeline orchestration
+│   └── base/                 # Base pipeline components
+│       ├── pipeline.go       # Pipeline execution logic
+│       └── builder.go        # Pipeline construction
+├── services/                 # External service clients
+│   ├── openai.go            # OpenAI API client
+│   └── telegram.go          # Telegram Bot API client
+├── config/                   # Configuration files
+│   ├── credentials.json      # API keys and tokens
+│   ├── credentials_example.json # Example credentials structure
+│   ├── credentials_test.json # Test credentials
+│   └── pipelines/           # Pipeline definitions
+│       ├── telegram.json    # Telegram motivational pipeline
+│       ├── telegram_news.json # Telegram news pipeline
+│       └── multi_telegram.json # Multi-channel example
+├── tools/                    # Utility tools
+│   └── get_channel_id.go    # Telegram channel ID finder
+├── tests/                    # Test files
+│   └── pipeline_test.go     # Pipeline unit tests
+└── docs/                     # Documentation
+    ├── ROADMAP.md           # Development roadmap
+    ├── FASE1_COMPLETADA.md  # Phase 1 completion report
+    └── NODES_DOCUMENTATION.md # Node configuration guide
+```
+
+## 🔐 Credential Management
+
+The application uses a **reference-based credential system**:
+
+### Credential Structure
+
+```json
+{
+  "service_name": {
+    "credential_name": {
+      "api_key": "value",
+      "other_param": "value"
+    }
+  }
+}
+```
+
+### Pipeline References
+
+Each node in a pipeline references credentials by name:
+
+```json
+{
+  "id": "text_generator",
+  "type": "text_generator",
+  "credentials": "default",  // References openai.default
+  "config": { ... }
+}
+```
+
+### Multiple Credentials Example
+
+You can have multiple credentials per service:
+
+```json
+{
+  "telegram": {
+    "motivational_bot": {
+      "bot_token": "token1",
+      "channel_id": "@motivational"
+    },
+    "news_bot": {
+      "bot_token": "token2", 
+      "channel_id": "@news"
+    }
+  }
+}
+```
+
+## 🧪 Testing
+
+Run the test suite:
+
+```bash
+go test ./...
+```
+
+Run specific tests:
+
+```bash
+go test ./tests/
+```
+
+## 📚 Adding New Nodes
+
+To add a new node:
+
+1. **Create the node implementation** in `nodes/` directory
+2. **Implement the Node interface**:
+   ```go
+   type Node interface {
+       Execute(ctx context.Context, input map[string]interface{}) (map[string]interface{}, error)
+       Validate() error
+   }
+   ```
+3. **Register the node** in `pipelines/base/builder.go`
+4. **Add configuration** to your pipeline JSON
+
+### Example: Adding a Text Formatter Node
 
 ```go
-// Add text formatter node
-textFormatter := nodes.NewTextFormatterNode()
-p.AddNode(textFormatter)
+// In nodes/formatters/text_formatter.go
+type TextFormatterNode struct {
+    config base.NodeConfig
+}
+
+func (n *TextFormatterNode) Execute(ctx context.Context, input map[string]interface{}) (map[string]interface{}, error) {
+    text := input["text"].(string)
+    formatted := strings.ToUpper(text)
+    return map[string]interface{}{"text": formatted}, nil
+}
 ```
 
-El pipeline se ejecutará en este orden:
+Then register it in the builder:
 
-1. TextGenerator → 2. TextFormatter → 3. TelegramPublisher
-
-## Estructura del Proyecto
-
+```go
+case "text_formatter":
+    return formatters.NewTextFormatterNode(nodeConfig)
 ```
-├── main.go                 # Punto de entrada
-├── nodes/                  # Directorio de nodos
-│   ├── text_generator.go   # Nodo generador de texto
-│   ├── text_formatter.go   # Nodo formateador de texto
-│   └── telegram_publisher.go # Nodo publicador de Telegram
-├── pipeline/               # Lógica del pipeline
-│   └── pipeline.go         # Orquestador de nodos
-├── config/                 # Configuración
-│   └── config.go           # Carga de variables de entorno
-└── tools/                  # Herramientas de utilidad
-    └── get_channel_id.go   # Obtener ID del canal de Telegram
-```
+
+## 🛣️ Development Roadmap
+
+See [ROADMAP.md](docs/ROADMAP.md) for detailed development phases:
+
+- ✅ **Phase 1**: Basic pipeline with OpenAI and Telegram (COMPLETED)
+- 🔄 **Phase 2**: Input nodes (TopicSelector, DataFetcher)
+- 📋 **Phase 3**: AI nodes (ImageGenerator, ContentAnalyzer)
+- 📋 **Phase 4**: Media nodes (ImageUploader, ImageProcessor)
+- 📋 **Phase 5**: Publisher nodes (LinkedIn, Instagram, Twitter)
+- 📋 **Phase 6**: Google Services (Sheets, Drive)
+- 📋 **Phase 7**: Specialized pipelines
+- 📋 **Phase 8**: Scheduling system
+- 📋 **Phase 9**: Logging and monitoring
+- 📋 **Phase 10**: Documentation and optimization
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**"Failed to load credentials"**
+- Ensure `config/credentials.json` exists and is valid JSON
+- Check that credential names match between pipeline and credentials files
+
+**"Telegram channel not found"**
+- Verify the bot is added to the channel as administrator
+- Check that the channel ID is correct (use `tools/get_channel_id.go`)
+
+**"OpenAI API error"**
+- Verify your API key is correct and has sufficient credits
+- Check that the model name is valid
+
+For more detailed troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
