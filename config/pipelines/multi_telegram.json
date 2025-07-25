@@ -1,0 +1,46 @@
+{
+  "name": "multi_telegram_pipeline",
+  "description": "Publishes content to multiple Telegram channels",
+  "schedule": "0 9 * * *",
+  "nodes": [
+    {
+      "id": "text_generator",
+      "type": "text_generator",
+      "name": "Generate Content",
+      "credentials": "default",
+      "config": {
+        "model": "gpt-3.5-turbo",
+        "prompt_template": "Generate a motivational text in Spanish. The text should be inspiring and positive, between 100-150 words.",
+        "max_tokens": 300,
+        "temperature": 0.8
+      }
+    },
+    {
+      "id": "telegram_motivational",
+      "type": "telegram_publisher",
+      "name": "Publish to Motivational Channel",
+      "credentials": "motivational_bot",
+      "config": {
+        "message_template": "💪 *Daily Motivation*\n\n%s\n\n✨ Have an amazing day!"
+      }
+    },
+    {
+      "id": "telegram_news",
+      "type": "telegram_publisher",
+      "name": "Publish to News Channel",
+      "credentials": "news_bot",
+      "config": {
+        "message_template": "📰 *Daily Inspiration*\n\n%s\n\n📅 Daily Update"
+      }
+    },
+    {
+      "id": "telegram_personal",
+      "type": "telegram_publisher",
+      "name": "Publish to Personal Channel",
+      "credentials": "personal_bot",
+      "config": {
+        "message_template": "💭 *Personal Note*\n\n%s\n\n🌟 Keep shining!"
+      }
+    }
+  ]
+} 

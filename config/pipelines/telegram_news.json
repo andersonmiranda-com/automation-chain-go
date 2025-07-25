@@ -1,0 +1,29 @@
+{
+  "name": "telegram_news_pipeline",
+  "description": "Genera y publica noticias en Telegram",
+  "schedule": "0 12 * * *",
+
+  "nodes": [
+    {
+      "id": "text_generator",
+      "type": "text_generator",
+      "name": "Generate News",
+      "credentials": "premium",
+      "config": {
+        "model": "gpt-4",
+        "prompt_template": "Generate a brief and objective news article about technology. It should be informative and neutral, with a maximum of 200 words.",
+        "max_tokens": 400,
+        "temperature": 0.3
+      }
+    },
+    {
+      "id": "telegram_publisher",
+      "type": "telegram_publisher",
+      "name": "Publish News to Telegram",
+      "credentials": "news_bot",
+      "config": {
+        "message_template": "📰 *News of the Day*\n\n%s\n\n📅 %s"
+      }
+    }
+  ]
+} 
